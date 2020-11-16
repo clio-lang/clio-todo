@@ -1,0 +1,44 @@
+title = "template-node"
+description = ""
+version = "0.1.0"
+license = "MIT"
+main = "src/main.clio"
+authors = [ "Your Name <you@example.com>" ]
+keywords = ""
+
+[build]
+directory = "build"
+target = "node"
+
+[target.node]
+directory = "src"
+target = "node"
+
+[scripts]
+test = "No tests specified"
+
+[[servers]]
+proto = "wt"
+name = "default"
+
+[[servers]]
+proto = "ws"
+name = "ws"
+host = "0.0.0.0"
+port = "3001"
+
+[[workers]]
+proto = "wt"
+count = "cpu"
+server = "default"
+
+[executor]
+proto = "wt"
+wait_for = "cpu"
+server = "default"
+
+[dependencies]
+stdlib = "latest"
+
+[npm_dependencies]
+rethinkdb = "2.4.2"

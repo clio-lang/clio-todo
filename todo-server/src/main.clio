@@ -1,0 +1,34 @@
+import "rethinkdb"
+
+await rethinkdb.connect # host: "localhost" port: 28015
+  => connection
+
+fn todo-table:
+  rethinkdb.db "todo" -> .table "todo"
+
+export fn feed:
+  channel () => ch
+
+  fn send err change:
+    ch.send "change" change
+
+  fn on-change err cursor:
+    cursor.each send
+
+  await todo-table ()
+    -> .changes
+    -> .run connection on-change
+
+  ch
+
+export fn get query:
+  todo-table () -> await .run connection -> await .toArray
+
+export fn insert todo:
+  todo-table () -> .insert todo -> .run connection
+
+export fn update id update:
+  todo-table () -> .get id -> .update update -> .run connection
+
+export fn remove id:
+  todo-table () -> .get id -> .delete -> .run connection

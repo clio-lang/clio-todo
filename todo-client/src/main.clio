@@ -1,0 +1,50 @@
+import feed get insert update remove from "ws://localhost:3001/main.clio"
+
+fn template todo:
+  f'<div class="todo sul-box-raised-3 with-hover" data-id="{todo.id}">
+    <input type="checkbox" class="sul-checkbox-type-1 done" {todo.done and "checked" or ""} />
+    <div class="content">{todo.content}</div>
+    <input type="submit" class="sul-btn remove-btn" value="Remove" />
+  </div>'
+
+fn add-todo event:
+  event.preventDefault ()
+  document.querySelector ".new-todo" => field
+  insert # content: field.value done: false
+  "" => field.value
+
+fn add-todo-dom todo:
+  document.querySelector ".main" => container
+  document.createElement "div" => el -> container.appendChild
+  template todo => el.outerHTML
+
+  fn remove-todo:
+    remove todo.id
+
+  fn update-todo ev:
+    update todo.id # done: ev.target.checked
+
+  document.querySelector f'[data-id="{todo.id}"] .remove-btn'
+    -> .addEventListener "click" remove-todo
+  
+  document.querySelector f'[data-id="{todo.id}"] .done'
+    -> .addEventListener "change" update-todo
+
+fn remove-todo-dom todo:
+  document.querySelector f'[data-id="{todo.id}"]' -> .remove
+
+fn update-todo-dom todo:
+  document.querySelector f'[data-id="{todo.id}"] .done' => checkbox
+  todo.done => checkbox.checked
+
+fn on-change data:
+  if data.old_val and data.new_val: update-todo-dom data.new_val
+  else if data.new_val: add-todo-dom data.new_val
+  else: remove-todo-dom data.old_val
+
+export fn main argv:
+  document.querySelector ".add-btn"
+    -> .addEventListener "click" add-todo
+
+  await feed () -> .on "change" on-change
+  await get () -> .forEach add-todo-dom
