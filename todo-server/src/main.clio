@@ -7,10 +7,10 @@ fn todo-table:
   rethinkdb.db "todo" -> .table "todo"
 
 export fn feed:
-  channel () => ch
+  emitter () => ch
 
   fn send err change:
-    ch.send "change" change
+    ch.emit "change" change
 
   fn on-change err cursor:
     cursor.each send
