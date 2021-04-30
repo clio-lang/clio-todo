@@ -1,5 +1,7 @@
 # Clio Todo Example
 
+Important note: This example doesn't run with the latest version of Clio.
+
 This is a fullstack client + server todo example written in Clio.
 
 To run this example, follow these steps:
